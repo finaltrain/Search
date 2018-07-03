@@ -1,5 +1,6 @@
 ﻿// 参考　https://tech-camp.in/note/technology/1050/
-// 上記ウェブサイトを参考にして探索アルゴリズム及びソートアルゴリズムをC#で記述した
+// 線形探索から選択ソートまでは上記ウェブサイトを参考にした
+// 探索アルゴリズム及びソートアルゴリズムをC#で記述した
 
 using System;
 
@@ -9,6 +10,7 @@ namespace ConsoleApp2
     {
         static int[] input = { 3, 5, 9, 12, 15, 21, 29, 35, 42, 51, 62, 78, 81, 87, 92, 93 };
         static int[] data = { 42, 21, 10, 2, 30, 51, 80, 90, 18, 56, 50, 25, 15, 95, 44, 69 };
+        static int[] sorted_data = data;
 
         // 線形探索(for文)
         static void Linear_search(int key)
@@ -55,16 +57,16 @@ namespace ConsoleApp2
             int search_right = input.Length - 1;
             int pivot = 0;
 
-            while (search_left < search_right)// この条件から外れることは無いはず？
+            while (search_left < search_right) // この条件から外れることは無いはず？
             {
                 pivot = (search_left + search_right) / 2;
-                Console.WriteLine("[" + search_left + "]から[" + search_right + "]の中心の" + pivot + "番を参照");// 参考
+                //Console.WriteLine("[" + search_left + "]から[" + search_right + "]の中心の" + pivot + "番を参照"); // オンにすると探索の流れがわかる
                 if (input[pivot] == key)
                 {
                     find_flag = true;
                     break;
                 }
-                if (pivot == search_left || pivot == search_right) break;// find_flag = falseでbreak
+                if (pivot == search_left || pivot == search_right) break; // find_flag = falseでbreak
                 if (key < input[pivot]) search_right = pivot;
                 if (key > input[pivot]) search_left = pivot;
             }
@@ -74,22 +76,105 @@ namespace ConsoleApp2
         }
 
         // バブルソート
-        static void Bubble_sort(int[] data)
+        static int[] Bubble_sort(int[] data)
         {
-            for (int i = 0; i < data.Length; i++)// for文の初期化部で変数を宣言するパターン
+            int[] tmp_data = (int[])data.Clone();
+            // tmp_dataを操作する。dataを操作するとそれ自体の値が変わってしまう。
+            // C#では配列は参照型なので関数に渡してそのまま操作すると関数の中で値が変わる。
+            // (int[])は型変換。
+
+            for (int i = 0; i < tmp_data.Length; i++) // for文の初期化部で変数を宣言するパターン
             {
-                for (int j = 1; j < data.Length; j++)
+                for (int j = 1; j < tmp_data.Length; j++)
                 {
-                    if (data[j - 1] > data[j])// ここの不等号変えると順番逆になる
+                    if (tmp_data[j - 1] > tmp_data[j]) // ここの不等号変えると順番逆になる
                     {
-                        int tmp = data[j - 1];
-                        data[j - 1] = data[j];
-                        data[j] = tmp;
+                        int tmp = tmp_data[j - 1];
+                        tmp_data[j - 1] = tmp_data[j];
+                        tmp_data[j] = tmp;
+                    }
+                }
+                //Lineup(tmp_data); // オンにすると配列の要素の変化が見れる
+            }
+
+            return tmp_data;
+        }
+
+        // 選択ソート
+        static int[] Selection_sort(int[] data)
+        {
+            int[] tmp_data = (int[])data.Clone();
+
+            for (int i = 0; i < tmp_data.Length; i++)
+            {
+                int min = i;
+                for (int j = i + 1; j < tmp_data.Length; j++)
+                {
+                    if (tmp_data[min] > tmp_data[j]) min = j;
+                }
+                int tmp = tmp_data[min];
+                tmp_data[min] = tmp_data[i];
+                tmp_data[i] = tmp;
+                //Lineup(tmp_data); 
+            }
+
+            return tmp_data;
+        }
+
+        // 自分で再発明した挿入ソート
+        static int[] Re_Insertion_sort(int[] data)
+        {
+            int[] tmp_data = (int[])data.Clone();
+
+            for (int i = 1; i < tmp_data.Length; i++)
+            {
+                int tmp = tmp_data[i];
+                for (int j = 0; j < i; j++)
+                {
+                    if (tmp_data[j] > tmp_data[i])
+                    {
+                        int tmp_j = j;
+                        for (j = i; tmp_j < j; j--)
+                        {
+                            tmp_data[j] = tmp_data[j - 1];
+                        }
+                        tmp_data[j] = tmp;
+                        break;
                     }
                 }
             }
+
+            return tmp_data;
         }
-        
+
+        // 挿入ソート
+        static int[] Insertion_sort(int[] data)
+        {
+            int[] tmp_data = (int[])data.Clone();
+            for (int i = 1; i < tmp_data.Length; i++)
+            {
+                int tmp = tmp_data[i];
+                if (tmp_data[i - 1] > tmp)
+                {
+                    int j = i;
+                    do
+                    {
+                        tmp_data[j] = tmp_data[j - 1];
+                        j--;
+                    } while (j > 0 && tmp_data[j - 1] > tmp); // 継続条件式
+                    tmp_data[j] = tmp;
+                }
+            }
+            return tmp_data;
+        }
+
+        // 配列の各要素を表示
+        static void Lineup(int[] data)
+        {
+            for (int i = 0; i < data.Length; i++) Console.Write(data[i] + ";");
+            Console.Write("\n");
+        }
+
         static void Main()
         {
             Console.WriteLine("線形探索(for文)");
@@ -108,11 +193,30 @@ namespace ConsoleApp2
             Binary_serch(10);
 
             Console.WriteLine("\nバブルソート");
-            for (int i = 0; i < data.Length; i++) Console.Write(data[i] + ";");
-            Console.Write("\n");
-            Bubble_sort(data);
-            for (int i = 0; i < data.Length; i++) Console.Write(data[i] + ";");
-            Console.Write("\n");
+            Lineup(data);
+            sorted_data = Bubble_sort(data);
+            Lineup(sorted_data);
+
+            sorted_data = data;
+
+            Console.WriteLine("\n選択ソート");
+            Lineup(data);
+            sorted_data = Selection_sort(data);
+            Lineup(sorted_data);
+
+            sorted_data = data;
+
+            Console.WriteLine("\n自分で再発明した挿入ソート");
+            Lineup(data);
+            sorted_data = Re_Insertion_sort(data);
+            Lineup(sorted_data);
+
+            sorted_data = data;
+
+            Console.WriteLine("\n挿入ソート");
+            Lineup(data);
+            sorted_data = Re_Insertion_sort(data);
+            Lineup(sorted_data);
 
             return;
         }
