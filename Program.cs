@@ -1,5 +1,9 @@
 ﻿// 参考　https://tech-camp.in/note/technology/1050/
 // 線形探索から選択ソートまでは上記ウェブサイトを参考にした
+
+// 参考　http://algoful.com/Archive/Algorithm/MergeSort
+// マージソートは上記ウェブサイトを参考にした
+
 // 探索アルゴリズム及びソートアルゴリズムをC#で記述した
 
 using System;
