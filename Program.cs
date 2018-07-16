@@ -9,8 +9,8 @@ namespace ConsoleApp2
     class Program
     {
         static int[] input = { 3, 5, 9, 12, 15, 21, 29, 35, 42, 51, 62, 78, 81, 87, 92, 93 };
-        static int[] data = { 42, 21, 10, 2, 30, 51, 80, 90, 18, 56, 50, 25, 15, 95, 44, 69 };
-        static int[] sorted_data = data;
+        static int[] raw_data = { 42, 21, 10, 2, 30, 51, 80, 90, 18, 56, 50, 25, 15, 95, 44, 69 };
+        static int[] sorted_data = raw_data;
 
         // 線形探索(for文)
         static void Linear_search(int key)
@@ -76,97 +76,222 @@ namespace ConsoleApp2
         }
 
         // バブルソート
-        static int[] Bubble_sort(int[] data)
+        static int[] Bubble_sort(int[] raw_data)
         {
-            int[] tmp_data = (int[])data.Clone();
+            int[] data = (int[])raw_data.Clone();
             // tmp_dataを操作する。dataを操作するとそれ自体の値が変わってしまう。
             // C#では配列は参照型なので関数に渡してそのまま操作すると関数の中で値が変わる。
             // (int[])は型変換。
 
-            for (int i = 0; i < tmp_data.Length; i++) // for文の初期化部で変数を宣言するパターン
+            for (int i = 0; i < data.Length; i++) // for文の初期化部で変数を宣言するパターン
             {
-                for (int j = 1; j < tmp_data.Length; j++)
+                for (int j = 1; j < data.Length; j++)
                 {
-                    if (tmp_data[j - 1] > tmp_data[j]) // ここの不等号変えると順番逆になる
+                    if (data[j - 1] > data[j]) // ここの不等号変えると順番逆になる
                     {
-                        int tmp = tmp_data[j - 1];
-                        tmp_data[j - 1] = tmp_data[j];
-                        tmp_data[j] = tmp;
+                        int tmp = data[j - 1];
+                        data[j - 1] = data[j];
+                        data[j] = tmp;
                     }
                 }
                 //Lineup(tmp_data); // オンにすると配列の要素の変化が見れる
             }
 
-            return tmp_data;
+            return data;
         }
 
         // 選択ソート
-        static int[] Selection_sort(int[] data)
+        static int[] Selection_sort(int[] raw_data)
         {
-            int[] tmp_data = (int[])data.Clone();
+            int[] data = (int[])raw_data.Clone();
 
-            for (int i = 0; i < tmp_data.Length; i++)
+            for (int i = 0; i < data.Length; i++)
             {
                 int min = i;
-                for (int j = i + 1; j < tmp_data.Length; j++)
+                for (int j = i + 1; j < data.Length; j++)
                 {
-                    if (tmp_data[min] > tmp_data[j]) min = j;
+                    if (data[min] > data[j]) min = j;
                 }
-                int tmp = tmp_data[min];
-                tmp_data[min] = tmp_data[i];
-                tmp_data[i] = tmp;
+                int tmp = data[min];
+                data[min] = data[i];
+                data[i] = tmp;
                 //Lineup(tmp_data); 
             }
 
-            return tmp_data;
+            return data;
         }
 
         // 自分で再発明した挿入ソート
-        static int[] Re_Insertion_sort(int[] data)
+        static int[] Re_Insertion_sort(int[] raw_data)
         {
-            int[] tmp_data = (int[])data.Clone();
+            int[] data = (int[])raw_data.Clone();
 
-            for (int i = 1; i < tmp_data.Length; i++)
+            for (int i = 1; i < data.Length; i++)
             {
-                int tmp = tmp_data[i];
+                int tmp = data[i];
                 for (int j = 0; j < i; j++)
                 {
-                    if (tmp_data[j] > tmp_data[i])
+                    if (data[j] > data[i])
                     {
                         int tmp_j = j;
                         for (j = i; tmp_j < j; j--)
                         {
-                            tmp_data[j] = tmp_data[j - 1];
+                            data[j] = data[j - 1];
                         }
-                        tmp_data[j] = tmp;
+                        data[j] = tmp;
                         break;
                     }
                 }
             }
 
-            return tmp_data;
+            return data;
         }
 
         // 挿入ソート
-        static int[] Insertion_sort(int[] data)
+        static int[] Insertion_sort(int[] raw_data)
         {
-            int[] tmp_data = (int[])data.Clone();
-            for (int i = 1; i < tmp_data.Length; i++)
+            int[] data = (int[])raw_data.Clone();
+            for (int i = 1; i < data.Length; i++)
             {
-                int tmp = tmp_data[i];
-                if (tmp_data[i - 1] > tmp)
+                int tmp = data[i];
+                if (data[i - 1] > tmp)
                 {
                     int j = i;
                     do
                     {
-                        tmp_data[j] = tmp_data[j - 1];
+                        data[j] = data[j - 1];
                         j--;
-                    } while (j > 0 && tmp_data[j - 1] > tmp); // 継続条件式
-                    tmp_data[j] = tmp;
+                    } while (j > 0 && data[j - 1] > tmp); // 継続条件式
+                    data[j] = tmp;
                 }
             }
-            return tmp_data;
+            return data;
         }
+
+        // マージソート
+        static int[] Merge_sort(int[] raw_data)
+        {
+            int[] data = (int[])raw_data.Clone();
+
+            int[] work = new int[(data.Length + 1) / 2];
+
+            Merge_sort(data, 0, data.Length - 1, work);
+
+            return data;
+        }
+
+        static void Merge_sort(int[] data, int left, int right, int[] work)
+        {
+            int mid = (right + left) / 2;
+            if (left == right)
+            {
+                return;
+            }
+            Merge_sort(data, left, mid, work);
+            Merge_sort(data, mid + 1, right, work);
+            Merge(data, left, right, mid, work);
+        }
+
+        static void Merge(int[] data, int left, int right, int mid, int[] work)
+        {
+            for (int i = left; i <= mid; i++) // 左半分をworkへ
+            {
+                work[i - left] = data[i];
+            }
+            int l = left; // 右半分の最初
+            int r = mid + 1; // 右半分の最後
+
+            while (true)
+            {
+                int k = l + r - (mid + 1); // lにrの増分を加える
+                if (l > mid) break; // 開始点がmidを超えたら終了
+                if (r > right)
+                {
+                    while (l <= mid) // 開始点がmidを超えたらループを抜ける
+                    {
+                        k = l + r - (mid + 1); // lにrの増分を加える
+                        // "l++ - left"は0,1,2,...ってなる
+                        // kは0,1,2,...
+                        data[k] = work[l++ - left];
+                    }
+                    break;
+                }
+                // 3項演算子 条件式?trueの場合の戻り値:falseの場合の戻り値
+                // A.CompareTo(B) A-Bの結果と一致
+                // ココを通過するとlかrがインクリメントされる
+                data[k] = work[l - left].CompareTo(data[r]) < 0 ? work[l++ - left] : data[r++]; // workの[l - left]とtmp_dataの[r]を比較して
+            }
+        }
+
+        // 自分で再発明したマージソート
+        static int[] Re_Merge_sort(int[] raw_data)
+        {
+            int[] data = (int[])raw_data.Clone();
+            int right = data.Length - 1; // 右端はdata.length "- 1"！！
+            int left = 0;
+            int mid = (right + left) / 2;
+            int[] work = new int[data.Length];
+
+            Re_Merge_sort(data, left, right, mid, work);
+
+            return data;
+        }
+
+        static void Re_Merge_sort(int[] data, int left, int right, int mid, int[] work)
+        {
+            // まずは分割
+            if (left == right) return;
+            mid = (left + right) / 2;
+
+            Re_Merge_sort(data, left, mid, mid, work);
+            Re_Merge_sort(data, mid + 1, right, mid, work);
+
+            // ここからマージ
+            // 左右に分けて左と右の先頭を比較していき、小さい方をwork[]に並べていく
+            // i,jは比較の対象の配列内の位置(iは左側、jは右側)
+            // iとjは比較されるたびにインクリメントされるので、初期値を引けばカウンターとして使える
+            for (int i = left, j = mid + 1; i <= mid;)
+            {
+                do
+                {
+                    if (data[i] < data[j])
+                    {
+                        work[i + j - left - mid - 1] = data[i++];
+                        break;
+                    }
+                    else
+                    {
+                        work[i + j - left - mid - 1] = data[j++];
+                    }
+                } while (j <= right);
+
+                if (i <= mid && j > right) // 比較対象が無くなって左が残った場合
+                {
+                    for (; i <= mid; i++)
+                    {
+                        work[i + j - left - mid - 1] = data[i];
+                    }
+                    break;
+                }
+
+                if (j <= right && i > mid) // 比較対象が無くなって右が残った場合
+                {
+                    for (; j <= right; j++)
+                    {
+                        work[i + j - left - mid - 1] = data[j];
+                    }
+                    break;
+                }
+            }
+
+            //workからtmpdataへコピー
+            for (int i = left; i <= right; i++)
+            {
+                data[i] = work[i - left];
+            }
+        }
+
+
 
         // 配列の各要素を表示
         static void Lineup(int[] data)
@@ -174,6 +299,8 @@ namespace ConsoleApp2
             for (int i = 0; i < data.Length; i++) Console.Write(data[i] + ";");
             Console.Write("\n");
         }
+
+
 
         static void Main()
         {
@@ -193,29 +320,43 @@ namespace ConsoleApp2
             Binary_serch(10);
 
             Console.WriteLine("\nバブルソート");
-            Lineup(data);
-            sorted_data = Bubble_sort(data);
+            Lineup(raw_data);
+            sorted_data = Bubble_sort(raw_data);
             Lineup(sorted_data);
 
-            sorted_data = data;
+            sorted_data = raw_data;
 
             Console.WriteLine("\n選択ソート");
-            Lineup(data);
-            sorted_data = Selection_sort(data);
+            Lineup(raw_data);
+            sorted_data = Selection_sort(raw_data);
             Lineup(sorted_data);
 
-            sorted_data = data;
+            sorted_data = raw_data;
 
             Console.WriteLine("\n自分で再発明した挿入ソート");
-            Lineup(data);
-            sorted_data = Re_Insertion_sort(data);
+            Lineup(raw_data);
+            sorted_data = Re_Insertion_sort(raw_data);
             Lineup(sorted_data);
 
-            sorted_data = data;
+            sorted_data = raw_data;
 
             Console.WriteLine("\n挿入ソート");
-            Lineup(data);
-            sorted_data = Re_Insertion_sort(data);
+            Lineup(raw_data);
+            sorted_data = Re_Insertion_sort(raw_data);
+            Lineup(sorted_data);
+
+            sorted_data = raw_data;
+
+            Console.WriteLine("\nマージソート");
+            Lineup(raw_data);
+            sorted_data = Merge_sort(raw_data);
+            Lineup(sorted_data);
+
+            sorted_data = raw_data;
+
+            Console.WriteLine("\n自分で再発明したマージソート");
+            Lineup(raw_data);
+            sorted_data = Re_Merge_sort(raw_data);
             Lineup(sorted_data);
 
             return;
