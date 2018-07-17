@@ -7,13 +7,14 @@
 // 探索アルゴリズム及びソートアルゴリズムをC#で記述した
 
 using System;
+using System.Collections.Generic;
 
 namespace ConsoleApp2
 {
     class Program
     {
         static int[] input = { 3, 5, 9, 12, 15, 21, 29, 35, 42, 51, 62, 78, 81, 87, 92, 93 };
-        static int[] raw_data = { 42, 21, 10, 2, 30, 51, 80, 90, 18, 56, 50, 25, 15, 95, 44, 69 };
+        static int[] raw_data = new int[16];
         static int[] sorted_data = raw_data;
 
         // 線形探索(for文)
@@ -295,6 +296,44 @@ namespace ConsoleApp2
             }
         }
 
+        // バケットソート(小さな整数値にしか使えない)
+        static int[] Bucket_sort(int[] raw_data)
+        {
+            int[] data = (int[])raw_data.Clone();
+
+            int max = new int();
+
+            // 配列の要素の最大値を取得
+            for (int i = 0; i < data.Length; i++)
+                max = data[i].CompareTo(max) > 0 ? data[i] : max;
+
+            // 0～最大値までのバケツを作成
+            List<int>[] bucket = new List<int>[max + 1]; // max + 1まで用意することに注意
+            for (int i = 0; i < max+1; i++)
+                bucket[i] = new List<int>();
+
+            // リストに配列を入れていく
+            for (int i = 0; i < data.Length; i++)
+                bucket[data[i]].Add(data[i]);
+
+            // 配列に戻す
+            for (int i = 0, j = 0; i < data.Length; i++)
+            {
+                for (; j <= max; j++)
+                {
+                    if (bucket[j] != null) // !じゃなくて!=
+                    {
+                        bucket[j].ForEach(item =>
+                        {
+                            data[i++] = item;
+                        });
+                    }
+                }
+            }
+
+            return data;
+        }
+
 
 
         // 配列の各要素を表示
@@ -302,6 +341,24 @@ namespace ConsoleApp2
         {
             for (int i = 0; i < data.Length; i++) Console.Write(data[i] + ";");
             Console.Write("\n");
+        }
+
+        // 配列にランダムな数字を並べる
+        static int[] Array_reset(int[] raw_data, int maxValue)
+        {
+            // 処理が早すぎてシード値Environment.TickCountが更新されず
+            // 同じ乱数を生成してしまう対策
+            int hoge = Environment.TickCount;
+            while (hoge == Environment.TickCount) ; // 値が変わるまで無限ループ
+
+            Random r = new Random();
+
+            for (int i = 0; i < raw_data.Length; i++)
+            {
+                raw_data[i] = r.Next(maxValue);
+            }
+
+            return raw_data;
         }
 
 
@@ -324,6 +381,7 @@ namespace ConsoleApp2
             Binary_serch(10);
 
             Console.WriteLine("\nバブルソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Bubble_sort(raw_data);
             Lineup(sorted_data);
@@ -331,6 +389,7 @@ namespace ConsoleApp2
             sorted_data = raw_data;
 
             Console.WriteLine("\n選択ソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Selection_sort(raw_data);
             Lineup(sorted_data);
@@ -338,6 +397,7 @@ namespace ConsoleApp2
             sorted_data = raw_data;
 
             Console.WriteLine("\n自分で再発明した挿入ソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Re_Insertion_sort(raw_data);
             Lineup(sorted_data);
@@ -345,6 +405,7 @@ namespace ConsoleApp2
             sorted_data = raw_data;
 
             Console.WriteLine("\n挿入ソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Re_Insertion_sort(raw_data);
             Lineup(sorted_data);
@@ -352,6 +413,7 @@ namespace ConsoleApp2
             sorted_data = raw_data;
 
             Console.WriteLine("\nマージソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Merge_sort(raw_data);
             Lineup(sorted_data);
@@ -359,8 +421,15 @@ namespace ConsoleApp2
             sorted_data = raw_data;
 
             Console.WriteLine("\n自分で再発明したマージソート");
+            Array_reset(raw_data, 100);
             Lineup(raw_data);
             sorted_data = Re_Merge_sort(raw_data);
+            Lineup(sorted_data);
+
+            Console.WriteLine("\nバケットソート");
+            Array_reset(raw_data, 100);
+            Lineup(raw_data);
+            sorted_data = Bucket_sort(raw_data);
             Lineup(sorted_data);
 
             return;
